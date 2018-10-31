@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="iei.entrega2.FXMLDocumentController">
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffff;" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <top>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #ffff;" BorderPane.alignment="CENTER">
+         <effect>
+            <DropShadow />
+         </effect>
+         <children>
+            <VBox alignment="CENTER_LEFT">
+               <children>
+                  <JFXCheckBox fx:id="checkAmazon" text="Amazon">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </JFXCheckBox>
+                  <JFXCheckBox fx:id="checkElCorteIngles" layoutX="10.0" layoutY="10.0" text="El Corte Inglés">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </JFXCheckBox>
+                  <JFXCheckBox fx:id="checkFnac" layoutX="10.0" layoutY="28.0" text="Fnac">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </JFXCheckBox>
+               </children>
+            </VBox>
+            <Line rotate="90.0" startX="-80.0" stroke="#cdcdcd" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Titulo del libro:">
+               <font>
+                  <Font size="17.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Text>
+            <JFXTextField fx:id="t_libro">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </JFXTextField>
+            <Line rotate="90.0" startX="-80.0" stroke="#cdcdcd">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Line>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Autor:">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Text>
+            <JFXTextField fx:id="autor">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </JFXTextField>
+            <JFXButton onAction="#Buscar" ripplerFill="#0b2bae" text="Buscar">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </JFXButton>
+         </children>
+      </HBox>
+   </top>
+</BorderPane>
