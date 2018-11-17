@@ -1,7 +1,6 @@
 package iei.entrega2;
 
 /**
- *
  * @author sergisanz
  */
 public class Libro {

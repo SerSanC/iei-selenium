@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.openqa.selenium.By;
@@ -29,10 +30,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class FXMLDocumentController implements Initializable {
 
-    private static void RellenarGrid() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     private Label label;
     @FXML
     private JFXCheckBox checkAmazon;
@@ -44,17 +41,21 @@ public class FXMLDocumentController implements Initializable {
     private JFXTextField t_libro;
     @FXML
     private JFXTextField autor;
-    @FXML
-    private GridPane grid;
+
     private static WebDriver driver = null;
 
-    private ArrayList<String> listFnac = new ArrayList<String>();
     @FXML
-    private VBox vbox;
+    ScrollPane scroll = new ScrollPane();
+    private ArrayList<String> listFnac = new ArrayList<String>();
+    int tamaño;
+    @FXML
+    private VBox vbox_identificador;
+    private GridPane grid_identificador;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        grid.setVisible(false);
+        // grid_identificador.setVisible(false);
+        grid_identificador = new GridPane();
     }
 
     @FXML
@@ -80,6 +81,9 @@ public class FXMLDocumentController implements Initializable {
         WebElement element = driver.findElement(By.id("Fnac_Search"));
         element.sendKeys(libro);
         element.submit();
+
+        tamaño = driver.findElements(By.className("Article-desc")).size();
+
         do {
             WebDriverWait waiting = new WebDriverWait(driver, 10);
             waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Article-desc")));
@@ -88,11 +92,11 @@ public class FXMLDocumentController implements Initializable {
             for (WebElement el : driver.findElements(By.className("Article-desc"))) {
                 List<WebElement> title = el.findElements(By.className("js-minifa-title"));
                 if (title.size() >= 1) {
-                    //listFnac.add(title.get(0).getText());
+                    listFnac.add(title.get(0).getText());
                     System.out.println(title.get(0).getText());
-                    String dato = title.get(0).getText();
+
                     //grid.add(new Label(dato),0,0);
-                 //   grid.add(new Label(listFnac.get(i)), i, 0);
+                    //   grid.add(new Label(listFnac.get(i)), i, 0);
                 }
             }
             try {
@@ -101,7 +105,7 @@ public class FXMLDocumentController implements Initializable {
                 break;
             }
         } while (driver.findElement(By.className("nextLevel1")) != null);
-              //      RellenarGridPane();
+        RellenarGridPane();
         //vbox.getChildren().addAll(grid);
 
         System.out.println("END");
@@ -112,14 +116,18 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void RellenarGridPane() {
-        for (int i = 0; i < listFnac.size(); i++) {
-            //System.out.println(listFnac.get(0)+ " DATOS");
-            // System.out.println(listFnac.get(1).toString()+ " DATOS2");
-            // System.out.println(listFnac.size()+ " DATOS3");
-            grid.add(new Label(listFnac.get(i)), i, 0);
+        grid_identificador.setVisible(false);
+        grid_identificador.add(new Label("Libro"), 1,0);
+        for (int i = 1; i < tamaño; i++) {
+            grid_identificador.add(new Label(listFnac.get(i)), 1, i);
         }
-        grid.setAlignment(Pos.CENTER);
-        grid.setPadding(new Insets(50, 20, 20, 20));
-        vbox.getChildren().addAll(grid);
+
+        grid_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
+      //  double tamaño2 = tamaño*50;
+        //vbox_identificador.setPrefSize(900, 100000);
+        vbox_identificador.getChildren().addAll(grid_identificador);
+        
+        grid_identificador.setVisible(true);
     }
 }
