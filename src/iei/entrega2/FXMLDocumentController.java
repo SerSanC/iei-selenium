@@ -46,7 +46,6 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     ScrollPane scroll = new ScrollPane();
-    private ArrayList<String> listFnac = new ArrayList<String>();
     int tamaño;
     @FXML
     private VBox vbox_identificador;
@@ -54,7 +53,6 @@ public class FXMLDocumentController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // grid_identificador.setVisible(false);
         grid_identificador = new GridPane();
     }
 
@@ -70,6 +68,8 @@ public class FXMLDocumentController implements Initializable {
     }
 
     public void Fnac(String libro, String autor) {
+        grid_identificador.setVisible(false);
+
         String exePath = "lib/chromedriver";
         System.setProperty("webdriver.chrome.driver", exePath);
         ChromeOptions options = new ChromeOptions();
@@ -83,20 +83,18 @@ public class FXMLDocumentController implements Initializable {
         element.submit();
 
         tamaño = driver.findElements(By.className("Article-desc")).size();
+        int i = 0;
 
         do {
             WebDriverWait waiting = new WebDriverWait(driver, 10);
             waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Article-desc")));
             waiting.until(ExpectedConditions.invisibilityOf(driver.findElement(By.id("ajaxLoader"))));
-            int i = 0;
             for (WebElement el : driver.findElements(By.className("Article-desc"))) {
                 List<WebElement> title = el.findElements(By.className("js-minifa-title"));
+                
                 if (title.size() >= 1) {
-                    listFnac.add(title.get(0).getText());
-                    System.out.println(title.get(0).getText());
-
-                    //grid.add(new Label(dato),0,0);
-                    //   grid.add(new Label(listFnac.get(i)), i, 0);
+                    grid_identificador.add(new Label(title.get(0).getText()), 1, i);
+                    i++;
                 }
             }
             try {
@@ -105,29 +103,19 @@ public class FXMLDocumentController implements Initializable {
                 break;
             }
         } while (driver.findElement(By.className("nextLevel1")) != null);
-        RellenarGridPane();
-        //vbox.getChildren().addAll(grid);
+        grid_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
+
+        vbox_identificador.getChildren().addAll(grid_identificador);
 
         System.out.println("END");
+        grid_identificador.setVisible(true);
+
     }
 
     private void Amazon(String libro, String autor) {
 
     }
 
-    private void RellenarGridPane() {
-        grid_identificador.setVisible(false);
-        grid_identificador.add(new Label("Libro"), 1,0);
-        for (int i = 1; i < tamaño; i++) {
-            grid_identificador.add(new Label(listFnac.get(i)), 1, i);
-        }
 
-        grid_identificador.setAlignment(Pos.CENTER);
-        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
-      //  double tamaño2 = tamaño*50;
-        //vbox_identificador.setPrefSize(900, 100000);
-        vbox_identificador.getChildren().addAll(grid_identificador);
-        
-        grid_identificador.setVisible(true);
-    }
 }
