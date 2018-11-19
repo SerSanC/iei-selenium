@@ -43,17 +43,20 @@ public class FXMLDocumentController implements Initializable {
     private JFXTextField autor;
 
     private static WebDriver driver = null;
-
-    @FXML
-    ScrollPane scroll = new ScrollPane();
     int tamaño;
+    
     @FXML
     private VBox vbox_identificador;
     private GridPane grid_identificador;
-
+    int i = 1;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         grid_identificador = new GridPane();
+        grid_identificador.add(new Label(" Sitio Web "), 0, 0);
+        grid_identificador.add(new Label(" Título "), 1, 0);
+        grid_identificador.add(new Label(" Precio "), 2, 0);
+        grid_identificador.add(new Label(" Descuento "), 3, 0);
     }
 
     @FXML
@@ -83,7 +86,7 @@ public class FXMLDocumentController implements Initializable {
         element.submit();
 
         tamaño = driver.findElements(By.className("Article-desc")).size();
-        int i = 0;
+   
 
         do {
             WebDriverWait waiting = new WebDriverWait(driver, 10);
@@ -91,9 +94,10 @@ public class FXMLDocumentController implements Initializable {
             waiting.until(ExpectedConditions.invisibilityOf(driver.findElement(By.id("ajaxLoader"))));
             for (WebElement el : driver.findElements(By.className("Article-desc"))) {
                 List<WebElement> title = el.findElements(By.className("js-minifa-title"));
-                
+
                 if (title.size() >= 1) {
-                    grid_identificador.add(new Label(title.get(0).getText()), 1, i);
+                    grid_identificador.add(new Label(" "+title.get(0).getText()+" "), 1, i);
+                    grid_identificador.addColumn(0, new Label(" Fnac "));
                     i++;
                 }
             }
@@ -109,13 +113,26 @@ public class FXMLDocumentController implements Initializable {
         vbox_identificador.getChildren().addAll(grid_identificador);
 
         System.out.println("END");
+        grid_identificador.setGridLinesVisible(true);
         grid_identificador.setVisible(true);
 
     }
 
     private void Amazon(String libro, String autor) {
+        String exePath = "lib/chromedriver";
+        System.setProperty("webdriver.chrome.driver", exePath);
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--start-maximized");
+        driver = new ChromeDriver(options);
+        driver.get("http://www.elcorteingles.es");
+        driver.findElement(By.className("menu-container")).click();
+        driver.findElement(By.className("md-10")).click();
+
+        //driver.findElements(By.cssSelector("ul.select-options>li.select-option")).get(1).click();
+        WebElement element = driver.findElement(By.id("search-box"));
+        element.sendKeys(libro);
+        element.submit();
 
     }
-
 
 }

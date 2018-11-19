@@ -17,7 +17,7 @@
    <center>
       <ScrollPane fx:id="scroll">
          <content>
-            <VBox fx:id="vbox_identificador" prefHeight="497.0" prefWidth="896.0" style="-fx-background-color: #ffff;" />
+            <VBox fx:id="vbox_identificador" fillWidth="false" prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: #ffff;" />
          </content>
       </ScrollPane>
    </center>
