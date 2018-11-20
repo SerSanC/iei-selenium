@@ -2,6 +2,7 @@ package iei.entrega2;
 
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXTextField;
+import static com.jfoenix.effects.JFXDepthManager.pop;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class FXMLDocumentController implements Initializable {
     private JFXTextField t_libro;
     @FXML
     private JFXTextField autor;
-
+    String precioAnt;
     private static WebDriver driver = null;
     int tamaño;
 
@@ -55,6 +56,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private ScrollPane scroll;
     private String dato;
+    private int cont = 0;
+    private int contador_busqueda;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -70,6 +73,11 @@ public class FXMLDocumentController implements Initializable {
         if (checkAmazon.isSelected()) {
             Amazon(t_libro.getText(), autor.getText());
         }
+        if (checkAmazon.isSelected() && checkFnac.isSelected()) {
+            Amazon(t_libro.getText(), autor.getText());
+            Fnac(t_libro.getText(), autor.getText());
+
+        }
     }
 
     public void Fnac(String titulo, String autor) {
@@ -84,6 +92,13 @@ public class FXMLDocumentController implements Initializable {
         driver.findElement(By.className("Header__aisle")).click();
         driver.findElements(By.cssSelector("ul.select-options>li.select-option")).get(1).click();
         WebElement element = driver.findElement(By.id("Fnac_Search"));
+
+        WebElement ventanaCookies
+                = driver.findElement(By.xpath("/html/body/aside/div/button"));
+        if (ventanaCookies != null) {
+            System.out.println("Detectado caja de cookies");
+            ventanaCookies.click();
+        }
 
         if (!autor.isEmpty()) {
             element.sendKeys(autor);
@@ -107,7 +122,10 @@ public class FXMLDocumentController implements Initializable {
     private void Fnac_Titulo(String titulo) {
         LimpiarGridPane();
         InicializarGridPane();
-        i = 1;
+        if (contador_busqueda > 0) {
+            i = 1;
+        }
+
         tamaño = driver.findElements(By.className("Article-item")).size();
 
         do {
@@ -120,9 +138,9 @@ public class FXMLDocumentController implements Initializable {
                 vbox_identificador.getChildren().add(label);
                 break;
             }
-            
+
             waiting.until(ExpectedConditions.invisibilityOf(driver.findElement(By.id("ajaxLoader"))));
-            
+
             for (WebElement el : driver.findElements(By.className("Article-item"))) {
                 List<WebElement> titles = el.findElements(By.className("js-minifa-title"));
                 String price = el.findElement(By.className("userPrice")).getText();
@@ -220,13 +238,69 @@ public class FXMLDocumentController implements Initializable {
         options.addArguments("--start-maximized");
         driver = new ChromeDriver(options);
         driver.get("http://www.elcorteingles.es");
-        driver.findElement(By.className("menu-container")).click();
-        driver.findElement(By.className("md-10")).click();
+        // driver.findElement(By.className("search-button")).click();
 
         //driver.findElements(By.cssSelector("ul.select-options>li.select-option")).get(1).click();
         WebElement element = driver.findElement(By.id("search-box"));
         element.sendKeys(libro);
         element.submit();
+
+        WebDriverWait waiting = new WebDriverWait(driver, 10);
+
+        driver.findElement(By.id("cookies-agree")).click();
+
+        waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("facet-popup")));
+        driver.findElements(By.className("facet-popup")).get(1).click();
+
+        try {
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("js-product-click")));
+        } catch (Exception e) {
+            LimpiarGridPane();
+            label = new Text("Libro no encontrado");
+            vbox_identificador.getChildren().add(label);
+            //     break;
+        }
+        int cont = 0;
+        //  do {
+        for (WebElement el : driver.findElements(By.className("js-product-click"))) {;
+
+            String titles = el.getText();
+            System.out.println("Titulos" + titles);
+            grid_identificador.addColumn(0, new Label(" El Corte Ingles "));
+
+            if (titles.length() >= 80) {
+                titles = titles.substring(0, 80);
+            }
+            grid_identificador.add(new Label(" " + titles + " "), 1, i);
+            //grid_identificador.addColumn(2, new Label(oldPrice));
+            //  grid_identificador.addColumn(3, new Label(price));
+            i++;
+
+        }
+
+        for (WebElement el : driver.findElements(By.className("product-preview"))) {
+
+            String precioAct = el.findElement(By.className("current")).getText();
+            try {
+                precioAnt = el.findElement(By.className("former")).getText();
+            } catch (Exception e) {
+                precioAnt = " ";
+            }
+            grid_identificador.addColumn(2, new Label(precioAnt));
+            grid_identificador.addColumn(3, new Label(precioAct));
+        }
+        //  cont++;
+        //   System.out.println(driver.findElements(By.className("pagination c12")).get(cont).getTagName());
+        //   System.out.println(driver.findElements(By.className("pagination c12")).get(cont).getText());
+        //  System.out.println(driver.findElements(By.className("pagination c12")).size());
+
+        // } while (true);
+        grid_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
+        vbox_identificador.getChildren().addAll(grid_identificador);
+        vbox_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setGridLinesVisible(true);
+        grid_identificador.setVisible(true);
     }
 
     private void InicializarGridPane() {
@@ -242,4 +316,46 @@ public class FXMLDocumentController implements Initializable {
         grid_identificador = null;
         grid_identificador = new GridPane();
     }
+
+    private void ECI_Titulo(String libro) {
+    }
+
+    private void ECI_Autor(String autor) {
+        List<WebElement> tamaños = driver.findElements(By.className("pagination c12"));
+        // do {
+        System.out.println("Tam" + tamaños.size());
+        WebDriverWait waiting = new WebDriverWait(driver, 10);
+        try {
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("js-product-click")));
+        } catch (Exception e) {
+            LimpiarGridPane();
+            label = new Text("Libro no encontrado");
+            vbox_identificador.getChildren().add(label);
+            //     break;
+        }
+
+        for (WebElement el : driver.findElements(By.className("js-product-click"))) {
+
+            String titles = el.getText();
+            System.out.println("Titulos" + titles);
+            /**
+             * String price =
+             * el.findElement(By.className("userPrice")).getText(); String
+             * oldPrice; try { oldPrice =
+             * el.findElement(By.className("oldPrice")).getText(); } catch
+             * (Exception e) { oldPrice = ""; } grid_identificador.addColumn(0,
+             * new Label(" Fnac ")); if (titles.size() >= 1) { dato =
+             * titles.get(0).getText(); if (dato.length() >= 80) { dato =
+             * dato.substring(0, 80); } grid_identificador.add(new Label(" " +
+             * dato + " "), 1, i); grid_identificador.addColumn(2, new
+             * Label(oldPrice)); grid_identificador.addColumn(3, new
+             * Label(price)); i++; } } try {
+             * driver.findElement(By.className("nextLevel1")).click(); } catch
+             * (Exception e) { break; }
+             */
+
+        }
+    }//while (driver.findElements(By.className("pagination c12")).get(10)!=null);
+    // 
+
 }
