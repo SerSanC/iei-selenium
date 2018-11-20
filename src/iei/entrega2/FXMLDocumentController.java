@@ -45,14 +45,15 @@ public class FXMLDocumentController implements Initializable {
 
     private static WebDriver driver = null;
     int tamaño;
-    
+
     @FXML
     private VBox vbox_identificador;
     private GridPane grid_identificador;
     int i = 1;
     @FXML
     private ScrollPane scroll;
-    
+    private String dato;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         grid_identificador = new GridPane();
@@ -84,7 +85,7 @@ public class FXMLDocumentController implements Initializable {
         driver.findElement(By.className("Header__aisle")).click();
         driver.findElements(By.cssSelector("ul.select-options>li.select-option")).get(1).click();
         WebElement element = driver.findElement(By.id("Fnac_Search"));
-        
+
         if(!autor.isEmpty()) {
             element.sendKeys(autor);
             element.submit();
@@ -94,7 +95,7 @@ public class FXMLDocumentController implements Initializable {
             element.submit();
             Fnac_Titulo(titulo);
         }
- 
+
         grid_identificador.setAlignment(Pos.CENTER);
         grid_identificador.setPadding(new Insets(50, 20, 20, 20));
         vbox_identificador.getChildren().addAll(grid_identificador);
@@ -103,10 +104,10 @@ public class FXMLDocumentController implements Initializable {
         grid_identificador.setVisible(true);
 
     }
-    
+
     private void Fnac_Titulo(String titulo) {
         tamaño = driver.findElements(By.className("Article-item")).size();
-   
+
         do {
             WebDriverWait waiting = new WebDriverWait(driver, 10);
             waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Article-item")));
@@ -135,7 +136,7 @@ public class FXMLDocumentController implements Initializable {
             }
         } while (driver.findElement(By.className("nextLevel1")) != null);
     }
-    
+
     private void Fnac_Autor(String autor) {
         WebDriverWait waiting = new WebDriverWait(driver, 10);
         waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Action-btn")));
