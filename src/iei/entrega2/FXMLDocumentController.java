@@ -20,6 +20,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -69,10 +70,9 @@ public class FXMLDocumentController implements Initializable {
         if (checkAmazon.isSelected()) {
             Amazon(t_libro.getText(), autor.getText());
         }
-
     }
 
-    public void Fnac(String libro, String autor) {
+    public void Fnac(String titulo, String autor) {
         grid_identificador.setVisible(false);
 
         String exePath = "lib/chromedriver";
@@ -85,27 +85,48 @@ public class FXMLDocumentController implements Initializable {
         driver.findElements(By.cssSelector("ul.select-options>li.select-option")).get(1).click();
         WebElement element = driver.findElement(By.id("Fnac_Search"));
         
-        if(!autor.isEmpty()){element.sendKeys(autor);System.out.println("Entras a autor");}
-        else{
-            element.sendKeys(libro);
+        if(!autor.isEmpty()) {
+            element.sendKeys(autor);
+            element.submit();
+            Fnac_Autor(autor);
+        } else {
+            element.sendKeys(titulo);
+            element.submit();
+            Fnac_Titulo(titulo);
         }
-        element.submit();
+ 
+        grid_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
+        vbox_identificador.getChildren().addAll(grid_identificador);
+        vbox_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setGridLinesVisible(true);
+        grid_identificador.setVisible(true);
 
-        tamaño = driver.findElements(By.className("Article-desc")).size();
+    }
+    
+    private void Fnac_Titulo(String titulo) {
+        tamaño = driver.findElements(By.className("Article-item")).size();
    
-
         do {
             WebDriverWait waiting = new WebDriverWait(driver, 10);
-            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Article-desc")));
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Article-item")));
             waiting.until(ExpectedConditions.invisibilityOf(driver.findElement(By.id("ajaxLoader"))));
-            for (WebElement el : driver.findElements(By.className("Article-desc"))) {
-                List<WebElement> title = el.findElements(By.className("js-minifa-title"));
-
-                if (title.size() >= 1) {
-                    grid_identificador.add(new Label(" "+title.get(0).getText()+" "), 1, i);
-                    grid_identificador.addColumn(0, new Label(" Fnac "));
+            for (WebElement el : driver.findElements(By.className("Article-item"))) {
+                List<WebElement> titles = el.findElements(By.className("js-minifa-title"));
+                String price = el.findElement(By.className("userPrice")).getText();
+                String oldPrice;
+                try {
+                    oldPrice = el.findElement(By.className("oldPrice")).getText();
+                } catch (Exception e) {
+                    oldPrice = "";
+                }
+                grid_identificador.addColumn(0, new Label(" Fnac "));
+                if (titles.size() >= 1) {
+                    grid_identificador.add(new Label(" "+titles.get(0).getText()+" "), 1, i);
                     i++;
                 }
+                grid_identificador.addColumn(2, new Label(oldPrice));
+                grid_identificador.addColumn(3, new Label(price));
             }
             try {
                 driver.findElement(By.className("nextLevel1")).click();
@@ -113,15 +134,52 @@ public class FXMLDocumentController implements Initializable {
                 break;
             }
         } while (driver.findElement(By.className("nextLevel1")) != null);
-        grid_identificador.setAlignment(Pos.CENTER);
-        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
-  
-        vbox_identificador.getChildren().addAll(grid_identificador);
-        vbox_identificador.setAlignment(Pos.CENTER);  
-        System.out.println("END");
-        grid_identificador.setGridLinesVisible(true);
-        grid_identificador.setVisible(true);
-
+    }
+    
+    private void Fnac_Autor(String autor) {
+        WebDriverWait waiting = new WebDriverWait(driver, 10);
+        waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Action-btn")));
+        WebElement fichaBtn = driver.findElement(By.className("Action-btn"));
+        if(fichaBtn.getText().equals("Ver ficha")) {
+            System.out.println("Ficha de autor encontrada.");
+            fichaBtn.click();
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("univers-text")));
+            List<WebElement> librosBtns = driver.findElements(By.className("univers-text"));
+            for (WebElement librosBtn : librosBtns) {
+                if(librosBtn.getText().equals("Libros")) {
+                    librosBtn.click();
+                }
+            }
+            do {
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("Article-item")));
+            waiting.until(ExpectedConditions.invisibilityOf(driver.findElement(By.id("ajaxLoader"))));
+            for (WebElement el : driver.findElements(By.className("Article-item"))) {
+                List<WebElement> titles = el.findElements(By.className("js-minifa-title"));
+                String price = el.findElement(By.className("userPrice")).getText();
+                String oldPrice;
+                try {
+                    oldPrice = el.findElement(By.className("oldPrice")).getText();
+                } catch (Exception e) {
+                    oldPrice = "";
+                }
+                grid_identificador.addColumn(0, new Label(" Fnac "));
+                if (titles.size() >= 1) {
+                    grid_identificador.add(new Label(" "+titles.get(0).getText()+" "), 1, i);
+                    i++;
+                }
+                grid_identificador.addColumn(2, new Label(oldPrice));
+                grid_identificador.addColumn(3, new Label(price));
+            }
+            try {
+                driver.findElement(By.className("nextLevel1")).click();
+            } catch (Exception e) {
+                break;
+            }
+        } while (driver.findElement(By.className("nextLevel1")) != null);
+        } else {
+            System.out.println("Ficha de autor no encontrada.");
+            Fnac_Titulo(autor);
+        }
     }
 
     private void Amazon(String libro, String autor) {
@@ -138,7 +196,6 @@ public class FXMLDocumentController implements Initializable {
         WebElement element = driver.findElement(By.id("search-box"));
         element.sendKeys(libro);
         element.submit();
-
     }
 
 }
