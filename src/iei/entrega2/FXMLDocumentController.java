@@ -51,6 +51,7 @@ public class FXMLDocumentController implements Initializable {
     int i = 1;
     @FXML
     private ScrollPane scroll;
+    private String dato;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -102,7 +103,13 @@ public class FXMLDocumentController implements Initializable {
                 List<WebElement> title = el.findElements(By.className("js-minifa-title"));
 
                 if (title.size() >= 1) {
-                    grid_identificador.add(new Label(" "+title.get(0).getText()+" "), 1, i);
+                    dato = title.get(0).getText();
+                    if(dato.length()>=80){
+                        dato = dato.substring(0,80);
+                        dato = dato +" ...";
+                    }
+                    
+                    grid_identificador.add(new Label(" "+dato+" "), 1, i);
                     grid_identificador.addColumn(0, new Label(" Fnac "));
                     i++;
                 }
