@@ -49,6 +49,8 @@ public class FXMLDocumentController implements Initializable {
     private VBox vbox_identificador;
     private GridPane grid_identificador;
     int i = 1;
+    @FXML
+    private ScrollPane scroll;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -82,7 +84,11 @@ public class FXMLDocumentController implements Initializable {
         driver.findElement(By.className("Header__aisle")).click();
         driver.findElements(By.cssSelector("ul.select-options>li.select-option")).get(1).click();
         WebElement element = driver.findElement(By.id("Fnac_Search"));
-        element.sendKeys(libro);
+        
+        if(!autor.isEmpty()){element.sendKeys(autor);System.out.println("Entras a autor");}
+        else{
+            element.sendKeys(libro);
+        }
         element.submit();
 
         tamaño = driver.findElements(By.className("Article-desc")).size();
@@ -109,9 +115,9 @@ public class FXMLDocumentController implements Initializable {
         } while (driver.findElement(By.className("nextLevel1")) != null);
         grid_identificador.setAlignment(Pos.CENTER);
         grid_identificador.setPadding(new Insets(50, 20, 20, 20));
-
+  
         vbox_identificador.getChildren().addAll(grid_identificador);
-
+        vbox_identificador.setAlignment(Pos.CENTER);  
         System.out.println("END");
         grid_identificador.setGridLinesVisible(true);
         grid_identificador.setVisible(true);

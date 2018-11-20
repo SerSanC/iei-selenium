@@ -13,11 +13,11 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="iei.entrega2.FXMLDocumentController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="iei.entrega2.FXMLDocumentController">
    <center>
-      <ScrollPane fx:id="scroll">
+      <ScrollPane fx:id="scroll" fitToHeight="true" fitToWidth="true">
          <content>
-            <VBox fx:id="vbox_identificador" fillWidth="false" prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: #ffff;" />
+            <VBox fx:id="vbox_identificador" prefHeight="500.0" prefWidth="1100.0" style="-fx-background-color: #ffff;" />
          </content>
       </ScrollPane>
    </center>
