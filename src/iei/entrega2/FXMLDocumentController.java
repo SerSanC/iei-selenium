@@ -307,8 +307,6 @@ public class FXMLDocumentController implements Initializable {
             for (WebElement el : driver.findElements(By.className("js-product-click"))) {
                 el.click();
                 System.out.println("Llegamos al break");
-                el.findElement(By.id("leisure-box")).click();
-                System.out.println("Llegamos al break2");
 
                 break;
             }
