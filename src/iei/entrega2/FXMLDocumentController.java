@@ -56,19 +56,24 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private VBox vbox_identificador;
     private GridPane grid_identificador;
+    private GridPane grid_identificador_ECI;
+
     int i = 1;
     @FXML
     private ScrollPane scroll;
     private String dato;
     private int cont = 0;
     private int contador_busqueda;
+    private int contador_busqueda_ECI;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         grid_identificador = new GridPane();
+        grid_identificador_ECI = new GridPane();
+
         InicializarGridPane();
         checkAmazon.setDisable(true);
-        
+
         checkFnac.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -91,13 +96,14 @@ public class FXMLDocumentController implements Initializable {
         LimpiarGridPane();
         InicializarGridPane();
         i = 1;
-        
-        if (checkFnac.isSelected() && !checkElCorteIngles.isSelected()) {
+
+        if (checkFnac.isSelected()) {
             Fnac(t_libro.getText(), autor.getText());
         }
-        if (checkElCorteIngles.isSelected() && !checkFnac.isSelected()) {
+
+        if (checkElCorteIngles.isSelected()) {
             ECI(t_libro.getText(), autor.getText());
-        }
+
         
         grid_identificador.setVisible(true);
     }
@@ -270,13 +276,13 @@ public class FXMLDocumentController implements Initializable {
             ECI_Autor(autor);
         }
 
-        grid_identificador.setAlignment(Pos.CENTER);
-        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
-        vbox_identificador.getChildren().addAll(grid_identificador);
+        grid_identificador_ECI.setAlignment(Pos.CENTER);
+        grid_identificador_ECI.setPadding(new Insets(50, 20, 20, 20));
+        vbox_identificador.getChildren().addAll(grid_identificador_ECI);
         vbox_identificador.setAlignment(Pos.CENTER);
         grid_identificador.setGridLinesVisible(true);
         grid_identificador.setVisible(true);
-        
+
         driver.close();
         driver.quit();
     }
@@ -295,7 +301,7 @@ public class FXMLDocumentController implements Initializable {
         grid_identificador = new GridPane();
     }
 
-    private void ECI_Titulo(String titulo) {        
+    private void ECI_Titulo(String titulo) {
         WebElement element = driver.findElement(By.id("search-box"));
         element.sendKeys(titulo);
         element.submit();
