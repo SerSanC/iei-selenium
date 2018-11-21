@@ -52,16 +52,21 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private VBox vbox_identificador;
     private GridPane grid_identificador;
+    private GridPane grid_identificador_ECI;
+
     int i = 1;
     @FXML
     private ScrollPane scroll;
     private String dato;
     private int cont = 0;
     private int contador_busqueda;
+    private int contador_busqueda_ECI;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         grid_identificador = new GridPane();
+        grid_identificador_ECI = new GridPane();
+
         InicializarGridPane();
     }
 
@@ -70,11 +75,11 @@ public class FXMLDocumentController implements Initializable {
         if (checkFnac.isSelected()) {
             Fnac(t_libro.getText(), autor.getText());
         }
-        if (checkAmazon.isSelected()) {
-            Amazon(t_libro.getText(), autor.getText());
+        if (checkElCorteIngles.isSelected()) {
+            ECI(t_libro.getText(), autor.getText());
         }
-        if (checkAmazon.isSelected() && checkFnac.isSelected()) {
-            Amazon(t_libro.getText(), autor.getText());
+        if (checkElCorteIngles.isSelected() && checkFnac.isSelected()) {
+            ECI(t_libro.getText(), autor.getText());
             Fnac(t_libro.getText(), autor.getText());
         }
     }
@@ -243,7 +248,9 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
-    private void Amazon(String libro, String autor) {
+    private void ECI(String libro, String autor) {
+        grid_identificador_ECI.setVisible(false);
+
         String exePath = "lib/chromedriver";
         System.setProperty("webdriver.chrome.driver", exePath);
         ChromeOptions options = new ChromeOptions();
@@ -252,6 +259,9 @@ public class FXMLDocumentController implements Initializable {
         driver.get("http://www.elcorteingles.es");
 
         if (!libro.isEmpty()) {
+            if (contador_busqueda_ECI > 0) {
+                i = 1;
+            }
             WebElement element = driver.findElement(By.id("search-box"));
             element.sendKeys(libro);
             element.submit();
@@ -284,19 +294,20 @@ public class FXMLDocumentController implements Initializable {
                 } catch (Exception e) {
                     precioAnt = " ";
                 }
-                grid_identificador.addColumn(0, new Label(" El Corte Ingles "));
+                grid_identificador_ECI.addColumn(0, new Label(" El Corte Ingles "));
 
                 if (titles.length() >= 80) {
-                    titles = titles.substring(0, 80);
+                    titles = titles.substring(0, 80) + "...";
                 }
-                grid_identificador.add(new Label(" " + titles + " "), 1, i);
-                grid_identificador.addColumn(2, new Label(precioAnt));
-                grid_identificador.addColumn(3, new Label(precioAct));
+                grid_identificador_ECI.add(new Label(" " + titles + " "), 1, i);
+                grid_identificador_ECI.addColumn(2, new Label(precioAnt));
+                grid_identificador_ECI.addColumn(3, new Label(precioAct));
                 j++;
                 i++;
 
             }
         }
+        contador_busqueda_ECI++;
         if (!autor.isEmpty()) {
             WebElement element = driver.findElement(By.id("search-box"));
             element.sendKeys(autor);
@@ -319,21 +330,44 @@ public class FXMLDocumentController implements Initializable {
             }
             int cont = 0;
             //  do {
+            int k = 0;
             for (WebElement el : driver.findElements(By.className("js-product-click"))) {
-                el.click();
-                System.out.println("Llegamos al break");
+                if (k == 1) {
+                    el.click();
+                    System.out.println("Llegamos al break");
 
-                break;
+                    break;
+                }
+                k++;
             }
+            try {
+                for (WebElement al : driver.findElements(By.cssSelector("div.product-features>dl.cb>dd"))) {
+                    System.out.println(al.getText());
+                    System.out.println("Antes del if");
+                    if (al.getText().equals(autor)) {
+                        System.out.println("Entramos al if");
+                        al.click();
+                    }
+                }
 
+                for (WebElement ie : driver.findElements(By.cssSelector("ul.dimensions>li"))) {
+                    System.out.println(ie.getText());
+                    if(ie.getText().equals("Ver todos sus libros (en papel)")){
+                        ie.click();
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+            
         }
 
-        grid_identificador.setAlignment(Pos.CENTER);
-        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
-        vbox_identificador.getChildren().addAll(grid_identificador);
+        grid_identificador_ECI.setAlignment(Pos.CENTER);
+        grid_identificador_ECI.setPadding(new Insets(50, 20, 20, 20));
+        vbox_identificador.getChildren().addAll(grid_identificador_ECI);
         vbox_identificador.setAlignment(Pos.CENTER);
-        grid_identificador.setGridLinesVisible(true);
-        grid_identificador.setVisible(true);
+        grid_identificador_ECI.setGridLinesVisible(true);
+        grid_identificador_ECI.setVisible(true);
     }
 
     private void InicializarGridPane() {
