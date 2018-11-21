@@ -276,14 +276,13 @@ public class FXMLDocumentController implements Initializable {
             ECI_Autor(autor);
         }
 
-        grid_identificador_ECI.setAlignment(Pos.CENTER);
-        grid_identificador_ECI.setPadding(new Insets(50, 20, 20, 20));
-        vbox_identificador.getChildren().addAll(grid_identificador_ECI);
+        grid_identificador.setAlignment(Pos.CENTER);
+        grid_identificador.setPadding(new Insets(50, 20, 20, 20));
+        vbox_identificador.getChildren().addAll(grid_identificador);
         vbox_identificador.setAlignment(Pos.CENTER);
         grid_identificador.setGridLinesVisible(true);
         grid_identificador.setVisible(true);
 
-        driver.close();
         driver.quit();
     }
 
@@ -327,7 +326,12 @@ public class FXMLDocumentController implements Initializable {
             for (WebElement el : driver.findElements(By.className("product-preview"))) {
                 String titles = el.findElement(By.className("js-product-click")).getText();
                 System.out.println(titles);
-                String precioAct = el.findElement(By.className("current")).getText();
+                String precioAct, precioAnt;
+                try {
+                    precioAct = el.findElement(By.className("current")).getText();
+                } catch (Exception e) {
+                    precioAct = "";
+                }
                 try {
                     precioAnt = el.findElement(By.className("former")).getText();
                 } catch (Exception e) {
@@ -366,25 +370,106 @@ public class FXMLDocumentController implements Initializable {
 
         driver.findElement(By.id("cookies-agree")).click();
 
-        waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("facet-popup")));
-        driver.findElements(By.className("facet-popup")).get(0).click();
+        try {
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("facet-popup")));
+            driver.findElements(By.className("facet-popup")).get(0).click();
+        } catch (Exception e) {
+            LimpiarGridPane();
+            label = new Text("Autor no encontrado");
+            vbox_identificador.getChildren().add(label);
+            driver.close();
+            return;
+        }
 
         try {
             waiting.until(ExpectedConditions.presenceOfElementLocated(By.className("js-product-click")));
         } catch (Exception e) {
             LimpiarGridPane();
-            label = new Text("Libro no encontrado");
+            label = new Text("Libros no encontrados");
             vbox_identificador.getChildren().add(label);
+            driver.close();
             //     break;
         }
-        int cont = 0;
-        //  do {
-        for (WebElement el : driver.findElements(By.className("js-product-click"))) {
-            el.click();
-            System.out.println("Llegamos al break");
+            int cont = 0;
+            //  do {
+            int k = 0;
+            for (WebElement el : driver.findElements(By.className("js-product-click"))) {
+                if (k == 1) {
+                    el.click();
+                    System.out.println("Llegamos al break");
 
-            break;
+                    break;
+                }
+                k++;
+            }
+         
+            waiting.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.product-features>dl.cb>dd>a")));
+            WebElement al = driver.findElements(By.cssSelector("div.product-features>dl.cb>dd>a")).get(0);
+            if(autor.contains(al.getText()) || al.getText().contains(autor)) {
+                al.click();
+            } else {
+                LimpiarGridPane();
+                label = new Text("Autor no encontrado");
+                vbox_identificador.getChildren().add(label);
+                driver.close();
+                return;
+            }
+            waiting.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tabbed-ctrl")));
+            List<WebElement> tabs = driver.findElements(By.className("tabbed-ctrl"));
+            WebElement oktab = null;
+            for (WebElement tab : tabs) {
+                if(tab.getText().equals("VER TODOS")) {
+                    oktab = tab;
+                    break;
+                }
+            }
+            try {
+                oktab.click();
+            } catch (Exception e) {
+                System.out.println("Tab no encontrada");
+            }
+            boolean last_page = false;
+            do {
+                waiting.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("product-preview")));
+                for (WebElement el : driver.findElements(By.className("product-preview"))) {
+                    String titles = el.findElement(By.className("js-product-click")).getText();
+                    System.out.println(titles);
+                    String precioAct, precioAnt;
+                    try {
+                        precioAct = el.findElement(By.className("current")).getText();
+                    } catch (Exception e) {
+                        precioAct = "";
+                    }
+                    try {
+                        precioAnt = el.findElement(By.className("former")).getText();
+                    } catch (Exception e) {
+                        precioAnt = "";
+                    }
+                    if(precioAnt.equals("")) {
+                        precioAnt = precioAct;
+                        precioAct = "";
+                    }
+                    grid_identificador.addColumn(0, new Label(" El Corte Ingles "));
+
+                    if (titles.length() >= 80) {
+                        titles = titles.substring(0, 80);
+                    }
+                    grid_identificador.add(new Label(" " + titles + " "), 1, i);
+                    grid_identificador.addColumn(2, new Label(precioAnt));
+                    grid_identificador.addColumn(3, new Label(precioAct));
+                    i++;
+                }
+                try {
+                    driver.findElements(By.cssSelector("div.pagination>ul li:last-child>a")).get(0).click();
+                    System.out.println("Next");
+                } catch (Exception e) {
+                    last_page = true;
+                    System.out.println("Última página");
+                }
+            } while (!last_page);
+
         }
+
     }
 
-}
+
