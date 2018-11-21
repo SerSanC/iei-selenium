@@ -103,7 +103,7 @@ public class FXMLDocumentController implements Initializable {
 
         if (checkElCorteIngles.isSelected()) {
             ECI(t_libro.getText(), autor.getText());
-
+        }
         
         grid_identificador.setVisible(true);
     }
